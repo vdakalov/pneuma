@@ -10,6 +10,9 @@ export default class MainScene extends Scene {
 
   protected onMouseDown(point: Point, button: Button, event: MouseEvent) {
     this.points.push(point);
+    if (this.points.length > 10) {
+      this.context.setActiveScene(MainScene);
+    }
   }
 
   public destroy(): void {
@@ -22,9 +25,9 @@ export default class MainScene extends Scene {
   }
 
   public draw(canvas: Canvas): void {
-    canvas.background(new Color(255, 0, 0));
-    const bg = new Color(120);
-    const bd = new Color(255);
+    canvas.background(Color.Gray400);
+    const bg = Color.LightGreen800;
+    const bd = Color.Red800;
     for (const point of this.points) {
       canvas.circle(point, 4)
         .fill(bg)

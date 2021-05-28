@@ -82,7 +82,7 @@ export default class Canvas {
   }
 
   public background(color: Color): void {
-    this.context.fillStyle = color.toRgbaString();
+    this.context.fillStyle = color.toString();
     this.context.fillRect(0, 0, this.width, this.height);
     this.context.fill();
   }
