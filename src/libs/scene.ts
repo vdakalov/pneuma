@@ -36,5 +36,5 @@ export default abstract class Scene implements Drawable {
 
   public abstract destroy(): void;
 
-  public abstract draw(context: Canvas, time: number): void;
+  public abstract draw(canvas: Canvas, time: number): void;
 }

@@ -1,10 +1,21 @@
-const DEG2RAD = Math.PI / 180;
+interface Sizeable {
+  left?: number;
+  top?: number;
+  width: number;
+  height: number;
+}
 
 export default class Point {
 
   public static Deg2Rad: number = Math.PI / 180;
 
   public static PI2: number = Math.PI * 2;
+
+  public static createRelative(rect: Sizeable, wp: number, hp: number = wp): Point {
+    const left = rect.left !== undefined ? rect.left : 0;
+    const top = rect.top !== undefined ? rect.top : 0;
+    return new this(left + rect.width * wp, top + rect.height * hp);
+  }
 
   public x: number;
 
