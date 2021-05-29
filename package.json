@@ -1,7 +1,7 @@
 {
-  "name": "template-ts-web",
-  "version": "1.0.0",
-  "description": "",
+  "name": "pneuma",
+  "version": "0.0.1",
+  "description": "TypeScript Canvas Framework",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
