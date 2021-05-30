@@ -3,6 +3,8 @@
   "version": "0.0.1",
   "description": "TypeScript Canvas Framework",
   "scripts": {
+    "build": "webpack",
+    "start": "webpack serve",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {

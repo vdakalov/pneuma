@@ -25,18 +25,23 @@ export default class ApplicationContext implements Drawable {
   public setActiveScene(Scene: typeof SceneConstructor): void {
     const instance = this.instances.hasOwnProperty(Scene.name)
       ? this.instances[Scene.name]
-      : this.instances[Scene.name] = new (Scene as any)(this);
+      : this.instances[Scene.name] = new (Scene as any)(this) as SceneConstructor;
     if (this.active !== instance) {
-      if (this.active !== undefined) {
-        this.active.unload();
-      }
+      this.unsetActiveScene();
+      console.log(new Date().toISOString(), 'ApplicationContext: set active scene', instance.constructor.name);
       this.active = instance;
-      instance.load();
+      this.input.attach(instance);
+      instance.onLoad();
     }
   }
 
   public unsetActiveScene(): void {
-    this.active = undefined;
+    if (this.active !== undefined) {
+      console.log(new Date().toISOString(), 'ApplicationContext: unset active scene', this.active.constructor.name);
+      this.active.onUnload();
+      this.input.detach(this.active);
+      this.active = undefined;
+    }
   }
 
   public draw(canvas: Canvas, time: number): void {

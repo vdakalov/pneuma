@@ -2,7 +2,7 @@ import Scene from '../libs/scene';
 import Canvas from '../libs/canvas';
 import Color from '../libs/color';
 import Point from '../libs/math/point';
-import { Button } from '../libs/input';
+import { PointerButton } from '../libs/input';
 
 import MainScene from './main';
 
@@ -15,11 +15,13 @@ export default class LevelScene extends Scene {
   public destroy(): void {
   }
 
-  protected onMouseDown(point: Point, button: Button, event: MouseEvent) {
+  public onMouseDown(point: Point, button: PointerButton, event: MouseEvent) {
     if (this.points.length >= this.max) {
-      this.context.setActiveScene(MainScene);
+      console.log(new Date().toISOString(), 'LevelScene: onMouseDown: load MainScene');
+      this.application.setActiveScene(MainScene);
       return;
     }
+    console.log(new Date().toISOString(), 'LevelScene: onMouseDown: add point');
     this.points.push(point);
   }
 
@@ -34,10 +36,10 @@ export default class LevelScene extends Scene {
     }
   }
 
-  public load(): void {
+  public onLoad(): void {
     this.max += 2;
   }
 
-  public unload(): void {
+  public onUnload(): void {
   }
 }

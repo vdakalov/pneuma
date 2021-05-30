@@ -2,7 +2,7 @@ import Scene from '../libs/scene';
 import Canvas from '../libs/canvas';
 import Color from '../libs/color';
 import Point from '../libs/math/point';
-import { Button } from '../libs/input';
+import { PointerButton } from '../libs/input';
 import Rectangle from '../libs/math/rectangle';
 
 import LevelScene from './level';
@@ -11,19 +11,20 @@ export default class MainScene extends Scene {
 
   private readonly buttonRect: Rectangle = new Rectangle(100, 80, 200, 120);
 
-  protected onMouseDown(point: Point, button: Button, event: MouseEvent) {
+  public onMouseDown(point: Point, button: PointerButton, event: MouseEvent) {
     if (this.buttonRect.contains(point)) {
-      this.context.setActiveScene(LevelScene);
+      console.log(new Date().toISOString(), 'MainScene: onMouseDown: load LevelScene');
+      this.application.setActiveScene(LevelScene);
     }
   }
 
   public destroy(): void {
   }
 
-  public load(): void {
+  public onLoad(): void {
   }
 
-  public unload(): void {
+  public onUnload(): void {
   }
 
   public draw(canvas: Canvas): void {

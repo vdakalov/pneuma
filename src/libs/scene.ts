@@ -2,37 +2,31 @@ import Drawable from './drawable';
 import ApplicationContext from './application-context';
 import Canvas from './canvas';
 import Point from './math/point';
-import { Button } from './input';
+import { InputTarget, PointerButton, KeyboardButton } from './input';
 
-export default abstract class Scene implements Drawable {
+export default abstract class Scene implements Drawable, InputTarget {
 
-  protected readonly context: ApplicationContext;
+  protected readonly application: ApplicationContext;
 
   constructor(context: ApplicationContext) {
-    this.context = context;
-    this.context.input.on('mousemove', this.onMouseMove.bind(this));
-    this.context.input.on('mousedown', this.onMouseDown.bind(this));
-    this.context.input.on('mouseup', this.onMouseUp.bind(this));
-    this.context.input.on('wheel', this.onMouseWheel.bind(this));
-    this.context.input.on('keydown', this.onKeyDown.bind(this));
-    this.context.input.on('keyup', this.onKeyUp.bind(this));
+    this.application = context;
   }
 
-  protected onMouseMove(point: Point, event: MouseEvent): void {}
+  public onMouseMove(point: Point, event: MouseEvent): void {}
 
-  protected onMouseDown(point: Point, button: Button, event: MouseEvent): void {}
+  public onMouseDown(point: Point, button: PointerButton, event: MouseEvent): void {}
 
-  protected onMouseUp(point: Point, button: Button, event: MouseEvent): void {}
+  public onMouseUp(point: Point, button: PointerButton, event: MouseEvent): void {}
 
-  protected onMouseWheel(point: Point, scroll: number, event: WheelEvent): void {}
+  public onMouseWheel(point: Point, scroll: number, event: WheelEvent): void {}
 
-  protected onKeyDown(event: KeyboardEvent): void {}
+  public onKeyDown(button: KeyboardButton, event: KeyboardEvent): void {}
 
-  protected onKeyUp(event: KeyboardEvent): void {}
+  public onKeyUp(button: KeyboardButton, event: KeyboardEvent): void {}
 
-  public abstract load(): void;
+  public abstract onLoad(): void;
 
-  public abstract unload(): void;
+  public abstract onUnload(): void;
 
   public abstract destroy(): void;
 

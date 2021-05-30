@@ -7,6 +7,7 @@ const context = element.getContext('2d');
 
 if (context) {
   const application = new Application(new Canvas(context), new Input(element));
+  element.tabIndex = 0;
   window.document.body.appendChild(element);
 }
 

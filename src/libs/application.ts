@@ -26,12 +26,8 @@ export default class Application {
     const now = window.performance.now();
     const time = this.lastAf === 0 ? 0 : now - this.lastAf;
     this.lastAf = now;
-    this.draw(time);
-    this.raf = window.requestAnimationFrame(this.bindLoop);
-  }
-
-  private draw(time: number): void {
     this.context.draw(this.canvas, time);
+    this.raf = window.requestAnimationFrame(this.bindLoop);
   }
 
   public destroy(): void {
