@@ -7,7 +7,9 @@ interface Sizeable {
 
 export default class Point {
 
-  public static Deg2Rad: number = Math.PI / 180;
+  public static Radian2Degree = 180 / Math.PI;
+
+  public static Degree2Radian: number = Math.PI / 180;
 
   public static PI2: number = Math.PI * 2;
 

@@ -255,22 +255,36 @@ export default class Canvas {
     this.context = renderingContext;
   }
 
-  public save(): void {
+  public translate(point: Point): this {
+    this.context.translate(point.x, point.y);
+    return this;
+  }
+
+  public rotate(rad: number): this {
+    this.context.rotate(rad);
+    return this;
+  }
+
+  public save(): this {
     this.context.save();
+    return this;
   }
 
-  public restore(): void {
+  public restore(): this {
     this.context.restore();
+    return this;
   }
 
-  public clear(): void {
+  public clear(): this {
     this.context.clearRect(0, 0, this.width, this.height);
+    return this;
   }
 
-  public background(color: Color): void {
+  public background(color: Color): this {
     this.context.fillStyle = color.toString();
     this.context.fillRect(0, 0, this.width, this.height);
     this.context.fill();
+    return this;
   }
 
   public circle(point: Point, radius: number): CircleShape {

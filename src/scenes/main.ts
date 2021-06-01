@@ -6,8 +6,19 @@ import { PointerButton } from '../libs/input';
 import Rectangle from '../libs/math/rectangle';
 
 import LevelScene from './level';
+import InteractiveUiNode from '../libs/ui/interactive';
+
+class SceneUi extends InteractiveUiNode {
+
+  public readonly body: Rectangle = new Rectangle(0, 0, 1, 1);
+
+  protected onDraw(context: Canvas, time: number): void {
+  }
+}
 
 export default class MainScene extends Scene {
+
+  public readonly ui: InteractiveUiNode = new SceneUi();
 
   private readonly buttonRect: Rectangle = new Rectangle(100, 80, 200, 120);
 

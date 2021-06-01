@@ -2,6 +2,7 @@ import SceneConstructor from './scene';
 import Drawable from './drawable';
 import Canvas from './canvas';
 import Input from './input';
+import UiGroup from './ui/group';
 
 export default class ApplicationContext implements Drawable {
 
@@ -30,7 +31,7 @@ export default class ApplicationContext implements Drawable {
       this.unsetActiveScene();
       console.log(new Date().toISOString(), 'ApplicationContext: set active scene', instance.constructor.name);
       this.active = instance;
-      this.input.attach(instance);
+      this.input.attach(instance.ui);
       instance.onLoad();
     }
   }
@@ -39,7 +40,7 @@ export default class ApplicationContext implements Drawable {
     if (this.active !== undefined) {
       console.log(new Date().toISOString(), 'ApplicationContext: unset active scene', this.active.constructor.name);
       this.active.onUnload();
-      this.input.detach(this.active);
+      this.input.detach(this.active.ui);
       this.active = undefined;
     }
   }
@@ -47,7 +48,6 @@ export default class ApplicationContext implements Drawable {
   public draw(canvas: Canvas, time: number): void {
     if (this.active !== undefined) {
       canvas.save();
-      canvas.clear();
       this.active.draw(canvas, time);
       canvas.restore();
     }

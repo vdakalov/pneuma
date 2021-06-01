@@ -37,6 +37,26 @@ export default class Rectangle {
     this.y2 = Math.max(y1, y2);
   }
 
+  public createTopLeftPoint(): Point {
+    return new Point(this.x1, this.y1);
+  }
+
+  public createTopRightPoint(): Point {
+    return new Point(this.x2, this.y1);
+  }
+
+  public createBottomLeftPoint(): Point {
+    return new Point(this.x1, this.y2);
+  }
+
+  public createBottomRightPoint(): Point {
+    return new Point(this.x2, this.y2);
+  }
+
+  public createCenterPoint(): Point {
+    return new Point(this.x1 + this.width / 2, this.y1 + this.height / 2);
+  }
+
   public contains(point: Point): boolean {
     return point.x >= this.x1 && this.x2 >= point.x && point.y >= this.y1 && this.y2 >= point.y;
   }

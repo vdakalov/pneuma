@@ -1,12 +1,21 @@
 import Point from './math/point';
 
-export interface InputTarget {
-  onMouseMove(point: Point, event: MouseEvent): void;
-  onMouseDown(point: Point, button: PointerButton, event: MouseEvent): void;
-  onMouseUp(point: Point, button: PointerButton, event: MouseEvent): void;
-  onMouseWheel(point: Point, value: number, event: WheelEvent): void;
-  onKeyDown(key: KeyboardButton, event: KeyboardEvent): void;
-  onKeyUp(key: KeyboardButton, event: KeyboardEvent): void;
+export enum Event {
+  MouseMove = 'inputMouseMove',
+  MouseDown = 'inputMouseDown',
+  MouseUp = 'inputMouseUp',
+  MouseWheel = 'inputMouseWheel',
+  KeyDown = 'inputKeyDown',
+  KeyUp = 'inputKeyUp'
+}
+
+export interface InputReceiver {
+  emit(eventName: Event.MouseMove, point: Point, event: MouseEvent): unknown;
+  emit(eventName: Event.MouseDown, point: Point, button: PointerButton, event: MouseEvent): unknown;
+  emit(eventName: Event.MouseUp, point: Point, button: PointerButton, event: MouseEvent): unknown;
+  emit(eventName: Event.MouseWheel, point: Point, value: number, event: WheelEvent): unknown;
+  emit(eventName: Event.KeyDown, key: KeyboardButton, event: KeyboardEvent): unknown;
+  emit(eventName: Event.KeyUp, key: KeyboardButton, event: KeyboardEvent): unknown;
 }
 
 export enum PointerButton {
@@ -150,7 +159,7 @@ export default class Input {
 
   private readonly keys: KeyboardButton[] = [];
 
-  private readonly targets: InputTarget[] = [];
+  private readonly receivers: InputReceiver[] = [];
 
   constructor(element: HTMLElement) {
     this.element = element;
@@ -163,14 +172,10 @@ export default class Input {
     this.element.addEventListener('keyup', this.onKeyUp.bind(this));
   }
 
-  private emit<T extends keyof InputTarget>(name: T, ...args: Parameters<InputTarget[T]>): void {
-    if (name !== 'onMouseMove') {
-      console.log(new Date().toISOString(),
-        'Input: before emit', name, this.targets.map(target => target.constructor.name));
-    }
-    for (const target of this.targets.slice(0, this.targets.length)) {
+  private emit(name: Event, ...args: any[]): void {
+    for (const target of this.receivers.slice(0, this.receivers.length)) {
       // @ts-ignore
-      target[name](...args);
+      target.emit(name, ...args);
     }
   }
 
@@ -184,19 +189,19 @@ export default class Input {
     const point = this.createPointFromPointerEvent(event);
     this.pointer[0] = point.x;
     this.pointer[1] = point.y;
-    this.emit('onMouseMove', point, event);
+    this.emit(Event.MouseMove, point, event);
   }
 
   private onMouseDown(event: MouseEvent): void {
     const point = this.createPointFromPointerEvent(event);
     this.pointer[2] = event.button;
-    this.emit('onMouseDown', point, event.button, event);
+    this.emit(Event.MouseDown, point, event.button, event);
   }
 
   private onMouseUp(event: MouseEvent): void {
     const point = this.createPointFromPointerEvent(event);
     this.pointer[2] = -1;
-    this.emit('onMouseUp', point, event.button, event);
+    this.emit(Event.KeyUp, point, event.button, event);
   }
 
   private onContextMenu(event: MouseEvent): void {
@@ -205,7 +210,7 @@ export default class Input {
 
   private onMouseWheel(event: WheelEvent): void {
     const point = this.createPointFromPointerEvent(event);
-    this.emit('onMouseWheel', point, event.deltaY * this.pointerScrollScale, event);
+    this.emit(Event.MouseWheel, point, event.deltaY * this.pointerScrollScale, event);
   }
 
   private onKeyDown(event: KeyboardEvent): void {
@@ -213,7 +218,7 @@ export default class Input {
     if (this.keys.indexOf(button) === -1) {
       this.keys.push(button);
     }
-    this.emit('onKeyDown', button, event);
+    this.emit(Event.KeyDown, button, event);
   }
 
   private onKeyUp(event: KeyboardEvent): void {
@@ -222,23 +227,23 @@ export default class Input {
     while ((index = this.keys.indexOf(button)) !== -1) {
       this.keys.splice(index, 1);
     }
-    this.emit('onKeyUp', button, event);
+    this.emit(Event.KeyUp, button, event);
   }
 
   public destroy(): void {
     // todo unbind all event listeners that bind in constructor
   }
 
-  public attach(target: InputTarget): void {
-    if (this.targets.indexOf(target) === -1) {
-      this.targets.push(target);
+  public attach(receiver: InputReceiver): void {
+    if (this.receivers.indexOf(receiver) === -1) {
+      this.receivers.push(receiver);
     }
   }
 
-  public detach(target: InputTarget): void {
-    const index = this.targets.indexOf(target);
+  public detach(receiver: InputReceiver): void {
+    const index = this.receivers.indexOf(receiver);
     if (index !== -1) {
-      this.targets.splice(index, 1);
+      this.receivers.splice(index, 1);
     }
   }
 
