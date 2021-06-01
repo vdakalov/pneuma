@@ -6,35 +6,95 @@ export default class Rectangle {
     return new this(a.x, a.y, b.x, b.y);
   }
 
-  public x1: number;
+  /**
+   * Left for pivot point
+   */
+  public left: number;
 
-  public y1: number;
+  /**
+   * Top for pivot point
+   */
+  public top: number;
 
-  public x2: number;
+  /**
+   * Rectangle width
+   */
+  public width: number;
 
-  public y2: number;
+  /**
+   * Rectangle height
+   */
+  public height: number;
 
-  public get left(): number {
-    return this.x1;
+  /**
+   * Pivot of left
+   */
+  public pivotLeft: number;
+
+  /**
+   * Pivot of top
+   */
+  public pivotTop: number;
+
+  /**
+   * Absolute left
+   */
+  public get x1(): number {
+    return this.left - this.width * this.pivotLeft;
   }
 
-  public get top(): number {
-    return this.y1;
+  /**
+   * Absolute top
+   */
+  public get y1(): number {
+    return this.top - this.height * this.pivotTop;
   }
 
-  public get width(): number {
-    return this.x2 - this.x1;
+  /**
+   * Absolute right
+   */
+  public get x2(): number {
+    return this.left + this.width * this.pivotLeft;
   }
 
-  public get height(): number {
-    return this.y2 - this.y1;
+  /**
+   * Absolute bottom
+   */
+  public get y2(): number {
+    return this.top + this.height * this.pivotTop;
   }
 
-  constructor(x1: number, y1: number, x2: number, y2: number) {
-    this.x1 = Math.min(x1, x2);
-    this.y1 = Math.min(y1, y2);
-    this.x2 = Math.max(x1, x2);
-    this.y2 = Math.max(y1, y2);
+  constructor(left: number,
+              top: number,
+              width: number,
+              height: number,
+              pivotLeft: number = 0.5,
+              pivotTop: number = 0.5) {
+    this.left = left;
+    this.top = top;
+    this.width = width;
+    this.height = height;
+    this.pivotLeft = pivotLeft;
+    this.pivotTop = pivotTop;
+  }
+
+  public clone(): Rectangle {
+    return new Rectangle(this.left, this.top, this.width, this.height, this.pivotLeft, this.pivotTop);
+  }
+
+  public setTo(other: Rectangle, withPivot: boolean = true): void {
+    other.left = this.left;
+    other.top = this.top;
+    other.width = this.width;
+    other.height = this.height;
+    if (withPivot) {
+      other.pivotLeft = this.pivotLeft;
+      other.pivotTop = this.pivotTop;
+    }
+  }
+
+  public setFrom(other: Rectangle, withPivot: boolean = true): void {
+    other.setTo(this, withPivot);
   }
 
   public createTopLeftPoint(): Point {

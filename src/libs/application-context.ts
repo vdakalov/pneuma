@@ -31,7 +31,7 @@ export default class ApplicationContext implements Drawable {
       this.unsetActiveScene();
       console.log(new Date().toISOString(), 'ApplicationContext: set active scene', instance.constructor.name);
       this.active = instance;
-      this.input.attach(instance.ui);
+      this.input.attach(instance);
       instance.onLoad();
     }
   }
@@ -40,7 +40,7 @@ export default class ApplicationContext implements Drawable {
     if (this.active !== undefined) {
       console.log(new Date().toISOString(), 'ApplicationContext: unset active scene', this.active.constructor.name);
       this.active.onUnload();
-      this.input.detach(this.active.ui);
+      this.input.detach(this.active);
       this.active = undefined;
     }
   }

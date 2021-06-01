@@ -9,7 +9,7 @@ export default abstract class DrawableUiNode<
   P extends UiNode<any, any> = UiNode<any, any>
   > extends UiNode<C, P> implements Drawable {
 
-  public visible: boolean = true;
+  public drawable: boolean = true;
 
   public angle: number = 0;
 
@@ -21,23 +21,22 @@ export default abstract class DrawableUiNode<
     this.angle = value * Point.Degree2Radian;
   }
 
-  public abstract body: Rectangle;
+  public readonly body: Rectangle = new Rectangle(0.5, 0.5, 1, 1);
 
   protected onBeforeDraw(canvas: Canvas): void {
     canvas.save();
     canvas.rotate(this.angle);
-    canvas.translate(this.body.createCenterPoint());
   }
 
   protected onAfterDraw(canvas: Canvas): void {
     canvas.restore();
   }
 
-  protected onDraw(context: Canvas, time: number): void {
+  protected onDraw(canvas: Canvas, time: number): void {
   }
 
   public draw(canvas: Canvas, time: number): void {
-    if (this.visible) {
+    if (this.drawable) {
       this.onBeforeDraw(canvas);
       this.onDraw(canvas, time);
       for (const child of this.children) {

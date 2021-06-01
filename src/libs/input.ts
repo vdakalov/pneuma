@@ -4,6 +4,7 @@ export enum Event {
   MouseMove = 'inputMouseMove',
   MouseDown = 'inputMouseDown',
   MouseUp = 'inputMouseUp',
+  MouseClick = 'inputClick',
   MouseWheel = 'inputMouseWheel',
   KeyDown = 'inputKeyDown',
   KeyUp = 'inputKeyUp'
@@ -13,6 +14,7 @@ export interface InputReceiver {
   emit(eventName: Event.MouseMove, point: Point, event: MouseEvent): unknown;
   emit(eventName: Event.MouseDown, point: Point, button: PointerButton, event: MouseEvent): unknown;
   emit(eventName: Event.MouseUp, point: Point, button: PointerButton, event: MouseEvent): unknown;
+  emit(eventName: Event.MouseClick, point: Point, button: PointerButton, event: MouseEvent): unknown;
   emit(eventName: Event.MouseWheel, point: Point, value: number, event: WheelEvent): unknown;
   emit(eventName: Event.KeyDown, key: KeyboardButton, event: KeyboardEvent): unknown;
   emit(eventName: Event.KeyUp, key: KeyboardButton, event: KeyboardEvent): unknown;
@@ -166,6 +168,7 @@ export default class Input {
     this.element.addEventListener('mousemove', this.onMouseMove.bind(this));
     this.element.addEventListener('mousedown', this.onMouseDown.bind(this));
     this.element.addEventListener('mouseup', this.onMouseUp.bind(this));
+    this.element.addEventListener('click', this.onClick.bind(this));
     this.element.addEventListener('contextmenu', this.onContextMenu.bind(this));
     this.element.addEventListener('wheel', this.onMouseWheel.bind(this));
     this.element.addEventListener('keydown', this.onKeyDown.bind(this));
@@ -173,16 +176,16 @@ export default class Input {
   }
 
   private emit(name: Event, ...args: any[]): void {
-    for (const target of this.receivers.slice(0, this.receivers.length)) {
+    for (const receiver of this.receivers.slice(0, this.receivers.length)) {
       // @ts-ignore
-      target.emit(name, ...args);
+      receiver.emit(name, ...args);
     }
   }
 
   private createPointFromPointerEvent(event: MouseEvent): Point {
     return new Point(
-      event.x - this.element.offsetLeft,
-      event.y - this.element.offsetTop);
+      (event.x - this.element.offsetLeft) / this.element.offsetWidth,
+      (event.y - this.element.offsetTop) / this.element.offsetHeight);
   }
 
   private onMouseMove(event: MouseEvent): void {
@@ -202,6 +205,10 @@ export default class Input {
     const point = this.createPointFromPointerEvent(event);
     this.pointer[2] = -1;
     this.emit(Event.KeyUp, point, event.button, event);
+  }
+
+  private onClick(event: MouseEvent): void {
+    this.emit(Event.MouseClick, this.createPointFromPointerEvent(event), event.button, event);
   }
 
   private onContextMenu(event: MouseEvent): void {

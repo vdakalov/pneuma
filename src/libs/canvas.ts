@@ -2,10 +2,10 @@ import Color from './color';
 import Point from './math/point';
 import Rectangle from './math/rectangle';
 
-type FontGlobalValues = 'inherit' | 'initial' | 'unset';
-type FontStyle = FontGlobalValues | 'normal' | 'italic' | 'oblique';
-type FontVariant = '' | 'normal' | 'small-caps';
-type FontWeight = FontGlobalValues
+export type FontGlobalValues = 'inherit' | 'initial' | 'unset';
+export type FontStyle = FontGlobalValues | 'normal' | 'italic' | 'oblique';
+export type FontVariant = '' | 'normal' | 'small-caps';
+export type FontWeight = FontGlobalValues
   | 'normal'
   | 'bold'
   | 'lighter'
@@ -19,7 +19,7 @@ type FontWeight = FontGlobalValues
   | '700'
   | '800'
   | '900';
-type FontSizeMeasure = 'cap'
+export type FontSizeMeasure = 'cap'
   | 'ch'
   | 'em'
   | 'ex'
@@ -41,8 +41,8 @@ type FontSizeMeasure = 'cap'
   | 'pc'
   | 'pt'
   ;
-type LineHeight = FontGlobalValues | number;
-type FontFamily = FontGlobalValues
+export type LineHeight = FontGlobalValues | number;
+export type FontFamily = FontGlobalValues
   | 'serif'
   | 'sans-serif'
   | 'monospace'
@@ -66,7 +66,9 @@ class Font {
 
   private _weight: FontWeight | undefined = undefined;
 
-  private _size: string = '10px';
+  private _sizeValue: number | undefined = undefined;
+
+  private _sizeMeasure: FontSizeMeasure | undefined = undefined;
 
   private _lineHeight: LineHeight | undefined = undefined;
 
@@ -76,8 +78,11 @@ class Font {
 
   private readonly shape: TextShape;
 
-  constructor(shape: TextShape) {
+  private readonly abs: number;
+
+  constructor(shape: TextShape, abs: number) {
     this.shape = shape;
+    this.abs = abs;
   }
 
   public style(value: FontStyle): TextShape {
@@ -95,8 +100,9 @@ class Font {
     return this.shape;
   }
 
-  public size(value: number, measure: FontSizeMeasure = 'px'): TextShape {
-    this._size = `${value}${measure}`;
+  public size(value: number, measure?: FontSizeMeasure): TextShape {
+    this._sizeValue = value;
+    this._sizeMeasure = measure;
     return this.shape;
   }
 
@@ -129,8 +135,11 @@ class Font {
     if (this._weight !== undefined) {
       result.push(this._weight);
     }
-    if (this._size !== undefined) {
-      result.push(this._size);
+    if (this._sizeValue !== undefined) {
+      const size = this._sizeMeasure === undefined
+        ? `${this.abs * this._sizeValue}px`
+        : `${this._sizeValue}${this._sizeMeasure}`;
+      result.push(size);
     }
     if (this._lineHeight !== undefined) {
       result.push(this._lineHeight.toString());
@@ -146,8 +155,11 @@ abstract class Shape {
 
   protected readonly context: CanvasRenderingContext2D;
 
-  constructor(context: CanvasRenderingContext2D) {
+  protected readonly abs: number;
+
+  constructor(context: CanvasRenderingContext2D, abs: number) {
     this.context = context;
+    this.abs = abs;
     this.context.beginPath();
   }
 
@@ -158,9 +170,11 @@ abstract class Shape {
     return this;
   }
 
-  public stroke(color: Color, width: number = this.context.lineWidth): this {
+  public stroke(color: Color, width?: number): this {
     this.context.strokeStyle = color.toRgbaString();
-    this.context.lineWidth = width;
+    if (width !== undefined) {
+      this.context.lineWidth = this.abs * width;
+    }
     this.context.stroke();
     this.context.closePath();
     return this;
@@ -168,33 +182,42 @@ abstract class Shape {
 }
 
 class CircleShape extends Shape {
-  constructor(context: CanvasRenderingContext2D, point: Point, radius: number) {
-    super(context);
-    context.arc(point.x, point.y, radius, 0, Point.PI2);
+  constructor(context: CanvasRenderingContext2D, abs: number, x: number, y: number, radius: number) {
+    super(context, abs);
+    context.arc(x, y, radius, 0, Point.PI2);
   }
 }
 
 class RectangleShape extends Shape {
-  constructor(context: CanvasRenderingContext2D, rectangle: Rectangle) {
-    super(context);
-    context.rect(rectangle.x1, rectangle.y1, rectangle.width, rectangle.height);
+  constructor(context: CanvasRenderingContext2D,
+              abs: number,
+              x: number,
+              y: number,
+              width: number,
+              height: number) {
+    super(context, abs);
+    context.rect(x, y, width, height);
   }
 }
 
 class TextShape extends Shape {
 
-  private readonly point: Point;
+  private readonly x: number;
+
+  private readonly y: number;
 
   private readonly value: string;
 
   private maxWidthValue: number | undefined = undefined;
 
-  public readonly font: Font = new Font(this);
+  public readonly font: Font;
 
-  constructor(context: CanvasRenderingContext2D, point: Point, value: string) {
-    super(context);
-    this.point = point;
+  constructor(context: CanvasRenderingContext2D, abs: number, x: number, y: number, value: string) {
+    super(context, abs);
+    this.x = x;
+    this.y = y;
     this.value = value;
+    this.font = new Font(this, abs);
   }
 
   public align(value: CanvasTextAlign): this {
@@ -215,14 +238,14 @@ class TextShape extends Shape {
   public fill(color: Color): this {
     this.context.font = this.font.toString();
     this.context.fillStyle = color.toString();
-    this.context.fillText(this.value, this.point.x, this.point.y, this.maxWidthValue);
+    this.context.fillText(this.value, this.x, this.y, this.maxWidthValue);
     return this;
   }
 
   public stroke(color: Color, width: number = this.context.lineWidth): this {
     this.context.font = this.font.toString();
     this.context.strokeStyle = color.toString();
-    this.context.strokeText(this.value, this.point.x, this.point.y, this.maxWidthValue);
+    this.context.strokeText(this.value, this.x, this.y, this.maxWidthValue);
     return this;
   }
 }
@@ -251,12 +274,16 @@ export default class Canvas {
 
   private readonly context: CanvasRenderingContext2D;
 
+  private get abs(): number {
+    return Math.min(this.width, this.height);
+  }
+
   constructor(renderingContext: CanvasRenderingContext2D) {
     this.context = renderingContext;
   }
 
   public translate(point: Point): this {
-    this.context.translate(point.x, point.y);
+    this.context.translate(this.width * point.x, this.height * point.y);
     return this;
   }
 
@@ -288,14 +315,21 @@ export default class Canvas {
   }
 
   public circle(point: Point, radius: number): CircleShape {
-    return new CircleShape(this.context, point, radius);
+    const x = this.width * point.x;
+    const y = this.height * point.y;
+    return new CircleShape(this.context, this.abs, x, y, radius);
   }
 
   public rectangle(rectangle: Rectangle): RectangleShape {
-    return new RectangleShape(this.context, rectangle);
+    const x = this.width * rectangle.x1;
+    const y = this.height * rectangle.y1;
+    const width = this.width * rectangle.width;
+    const height = this.height * rectangle.height;
+    return new RectangleShape(this.context, this.abs, x, y, width, height);
   }
 
   public text(point: Point, value: string): TextShape {
-    return new TextShape(this.context, point, value);
+    const height = Math.min(this.width, this.height);
+    return new TextShape(this.context, height, this.width * point.x, this.height * point.y, value);
   }
 }

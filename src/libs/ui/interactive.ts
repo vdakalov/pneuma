@@ -11,14 +11,13 @@ export default abstract class InteractiveUiNode<
 
   public interactive: boolean = true;
 
-  public abstract body: Rectangle;
-
   constructor() {
     super();
     this
       .on(Event.MouseMove, this.onInputMouseMove.bind(this))
       .on(Event.MouseDown, this.onInputMouseDown.bind(this))
       .on(Event.MouseUp, this.onInputMouseUp.bind(this))
+      .on(Event.MouseClick, this.onInputMouseClick.bind(this))
       .on(Event.MouseWheel, this.onInputMouseWheel.bind(this))
       .on(Event.KeyDown, this.onInputKeyDown.bind(this))
       .on(Event.KeyUp, this.onInputKeyUp.bind(this));
@@ -57,6 +56,17 @@ export default abstract class InteractiveUiNode<
     }
   }
 
+  protected onInputMouseClick(point: Point, button: PointerButton, event: MouseEvent): void {
+    if (this.interactive && this.body.contains(point)) {
+      this.onMouseClick(point, button, event);
+      for (const child of this.children) {
+        if (child instanceof InteractiveUiNode) {
+          child.onInputMouseClick(point, button, event);
+        }
+      }
+    }
+  }
+
   protected onInputMouseWheel(point: Point, value: number, event: WheelEvent): void {
     if (this.interactive && this.body.contains(point)) {
       this.onMouseWheel(point, value, event);
@@ -90,21 +100,24 @@ export default abstract class InteractiveUiNode<
     }
   }
 
-  protected onKeyDown(key: KeyboardButton, event: KeyboardEvent): void {
-  }
-
-  protected onKeyUp(key: KeyboardButton, event: KeyboardEvent): void {
+  protected onMouseMove(point: Point, event: MouseEvent): void {
   }
 
   protected onMouseDown(point: Point, button: PointerButton, event: MouseEvent): void {
   }
 
-  protected onMouseMove(point: Point, event: MouseEvent): void {
-  }
-
   protected onMouseUp(point: Point, button: PointerButton, event: MouseEvent): void {
   }
 
+  protected onMouseClick(point: Point, button: PointerButton, event: MouseEvent): void {
+  }
+
   protected onMouseWheel(point: Point, value: number, event: WheelEvent): void {
+  }
+
+  protected onKeyDown(key: KeyboardButton, event: KeyboardEvent): void {
+  }
+
+  protected onKeyUp(key: KeyboardButton, event: KeyboardEvent): void {
   }
 }

@@ -1,25 +1,22 @@
-import Drawable from './drawable';
 import ApplicationContext from './application-context';
-import Canvas from './canvas';
-import { EventEmitter } from 'events';
-import UiNode from './ui-node';
+import InteractiveUiNode from './ui/interactive';
 
-export default abstract class Scene extends EventEmitter implements Drawable {
-
-  public abstract ui: UiNode;
+export default abstract class Scene extends InteractiveUiNode {
 
   protected readonly application: ApplicationContext;
 
   constructor(context: ApplicationContext) {
     super();
     this.application = context;
+    setTimeout(this.onCreate.bind(this), 0);
   }
 
-  public abstract onLoad(): void;
+  protected onCreate(): void {
+  }
 
-  public abstract onUnload(): void;
+  public onLoad(): void {
+  }
 
-  public abstract destroy(): void;
-
-  public abstract draw(canvas: Canvas, time: number): void;
+  public onUnload(): void {
+  }
 }

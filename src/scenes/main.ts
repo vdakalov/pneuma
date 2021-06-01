@@ -2,58 +2,32 @@ import Scene from '../libs/scene';
 import Canvas from '../libs/canvas';
 import Color from '../libs/color';
 import Point from '../libs/math/point';
-import { PointerButton } from '../libs/input';
 import Rectangle from '../libs/math/rectangle';
-
-import LevelScene from './level';
-import InteractiveUiNode from '../libs/ui/interactive';
-
-class SceneUi extends InteractiveUiNode {
-
-  public readonly body: Rectangle = new Rectangle(0, 0, 1, 1);
-
-  protected onDraw(context: Canvas, time: number): void {
-  }
-}
+import Button from '../libs/ui/elements/button';
 
 export default class MainScene extends Scene {
 
-  public readonly ui: InteractiveUiNode = new SceneUi();
+  private readonly buttonStart: Button = new Button('Start', new Rectangle(0.5, 0.7, 0.20, 0.14))
+    .on('pressed', this.onButtonStartPressed.bind(this))
+    .appendTo(this);
 
-  private readonly buttonRect: Rectangle = new Rectangle(100, 80, 200, 120);
-
-  public onMouseDown(point: Point, button: PointerButton, event: MouseEvent) {
-    if (this.buttonRect.contains(point)) {
-      console.log(new Date().toISOString(), 'MainScene: onMouseDown: load LevelScene');
-      this.application.setActiveScene(LevelScene);
-    }
+  private onButtonStartPressed(): void {
+    console.log('PRESSED!');
   }
 
-  public destroy(): void {
+  protected onCreate() {
+    // this.buttonStart.degree = 45;
   }
 
-  public onLoad(): void {
-  }
-
-  public onUnload(): void {
-  }
-
-  public draw(canvas: Canvas): void {
+  protected onDraw(canvas: Canvas): void {
     canvas.background(Color.AmberA200);
     canvas
-      .text(Point.createRelative(canvas, 0.5, 0.3), 'GameName!')
+      .text(new Point(0.5, 0.25), 'Game!')
       .align('center')
       .baseline('middle')
-      .font.size(48)
+      .font.size(0.3)
       .font.weight('bold')
-      .fill(Color.BlueGray400);
-    canvas
-      .rectangle(this.buttonRect)
-      .fill(Color.RedA100)
-      .stroke(Color.Red800, 4);
-    canvas
-      .text(Point.createRelative(this.buttonRect, 0.5), 'Start')
-      .font.size(28)
-      .fill(Color.Blue900);
+      .fill(Color.LightGreen800)
+    ;
   }
 }
