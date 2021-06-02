@@ -5,6 +5,8 @@ import Point from '../libs/math/point';
 import Rectangle from '../libs/math/rectangle';
 import Button from '../libs/ui/elements/button';
 
+import LevelScene from './level';
+
 export default class MainScene extends Scene {
 
   private readonly buttonStart: Button = new Button('Start', new Rectangle(0.5, 0.7, 0.20, 0.14))
@@ -12,7 +14,7 @@ export default class MainScene extends Scene {
     .appendTo(this);
 
   private onButtonStartPressed(): void {
-    console.log('PRESSED!');
+    this.application.setActiveScene(LevelScene);
   }
 
   protected onDraw(canvas: Canvas): void {

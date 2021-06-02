@@ -14,15 +14,9 @@ export default abstract class DrawableUiNode<
   public readonly body: Rectangle = new Rectangle(0.5, 0.5, 1, 1);
 
   protected onBeforeDraw(canvas: Canvas): void {
-    canvas.save();
-    const rotatePoint = this.body.createRotatePoint();
-    canvas.translate(rotatePoint);
-    canvas.rotate(this.body.angle);
-    canvas.translate(rotatePoint.scale(-1));
   }
 
   protected onAfterDraw(canvas: Canvas): void {
-    canvas.restore();
   }
 
   protected onDraw(canvas: Canvas, time: number): void {
@@ -30,6 +24,11 @@ export default abstract class DrawableUiNode<
 
   public draw(canvas: Canvas, time: number): void {
     if (this.drawable) {
+      canvas.save();
+      const rotatePoint = this.body.createRotatePoint();
+      canvas.translate(rotatePoint);
+      canvas.rotate(this.body.angle);
+      canvas.translate(rotatePoint.scale(-1));
       this.onBeforeDraw(canvas);
       this.onDraw(canvas, time);
       for (const child of this.children) {
@@ -38,6 +37,7 @@ export default abstract class DrawableUiNode<
         }
       }
       this.onAfterDraw(canvas);
+      canvas.restore();
     }
   }
 }

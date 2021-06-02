@@ -2,6 +2,44 @@ import Color from './color';
 import Point from './math/point';
 import Rectangle from './math/rectangle';
 
+export enum Cursor {
+  Alias = 'alias',
+  AllScroll = 'all-scroll',
+  Auto = 'auto',
+  Cell = 'cell',
+  ContextMenu = 'context-menu',
+  ColResize = 'col-resize',
+  Copy = 'copy',
+  CrossHair = 'crosshair',
+  Default = 'default',
+  EResize = 'e-resize',
+  EWResize = 'ew-resize',
+  Grab = 'grab',
+  Grabbing = 'grabbing',
+  Help = 'help',
+  Move = 'move',
+  NResize = 'n-resize',
+  NEResize = 'ne-resize',
+  NESWResize = 'nesw-resize',
+  NSResize = 'ns-resize',
+  NWResize = 'nw-resize',
+  NWSEResize = 'nwse-resize',
+  NoDrop = 'no-drop',
+  None = 'none',
+  NotAllowed = 'not-allowed',
+  Pointer = 'pointer',
+  Progress = 'progress',
+  RowResize = 'row-resize',
+  SResize = 's-resize',
+  SEResize = 'se-resize',
+  SWResize = 'sw-resize',
+  Text = 'text',
+  WResize = 'w-resize',
+  Wait = 'wait',
+  ZoomIn = 'zoom-in',
+  ZoomOut = 'zoom-out'
+}
+
 export type FontGlobalValues = 'inherit' | 'initial' | 'unset';
 export type FontStyle = FontGlobalValues | 'normal' | 'italic' | 'oblique';
 export type FontVariant = '' | 'normal' | 'small-caps';
@@ -272,6 +310,14 @@ export default class Canvas {
     this.context.canvas.height = value;
   }
 
+  public get cursor(): Cursor {
+    return this.element.style.cursor as Cursor || Cursor.Auto;
+  }
+
+  public set cursor(value: Cursor) {
+    this.element.style.cursor = value;
+  }
+
   private readonly context: CanvasRenderingContext2D;
 
   private get abs(): number {
@@ -325,7 +371,7 @@ export default class Canvas {
   public circle(point: Point, radius: number): CircleShape {
     const x = this.width * point.x;
     const y = this.height * point.y;
-    return new CircleShape(this.context, this.abs, x, y, radius);
+    return new CircleShape(this.context, this.abs, x, y, this.abs * radius);
   }
 
   public rectangle(rectangle: Rectangle): RectangleShape {
