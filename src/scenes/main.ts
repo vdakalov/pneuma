@@ -15,13 +15,9 @@ export default class MainScene extends Scene {
     console.log('PRESSED!');
   }
 
-  protected onCreate() {
-    // this.buttonStart.degree = 45;
-  }
-
   protected onDraw(canvas: Canvas): void {
-    canvas.background(Color.AmberA200);
     canvas
+      .background(Color.AmberA200)
       .text(new Point(0.5, 0.25), 'Game!')
       .align('center')
       .baseline('middle')

@@ -17,11 +17,11 @@ export default class Button extends InteractiveUiNode {
 
   public fontSizeMeasure: FontSizeMeasure | undefined = undefined;
 
-  public borderColor: Color = Color.Red100;
+  public borderColor: Color = Color.Red900;
 
-  public borderWidth: number = 0;
+  public borderWidth: number = 0.01;
 
-  public backgroundColor: Color = Color.Red600;
+  public backgroundColor: Color = Color.Red400;
 
   public foregroundColor: Color = Color.Blue900;
 
@@ -29,6 +29,16 @@ export default class Button extends InteractiveUiNode {
     super();
     this.text = text;
     this.body.setFrom(body);
+  }
+
+  protected onMouseEnter(point: Point, event: MouseEvent) {
+    this.backgroundColor = Color.Red200;
+    this.borderColor = Color.Red600;
+  }
+
+  protected onMouseLeave(point: Point, event: MouseEvent) {
+    this.backgroundColor = Color.Red400;
+    this.borderColor = Color.Red900;
   }
 
   protected onMouseClick(point: Point, button: PointerButton, event: MouseEvent) {

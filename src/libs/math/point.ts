@@ -1,11 +1,15 @@
 
 export default class Point {
 
-  public static Radian2Degree = 180 / Math.PI;
+  public static readonly Radian2Degree: number = 180 / Math.PI;
 
-  public static Degree2Radian: number = Math.PI / 180;
+  public static readonly Degree2Radian: number = Math.PI / 180;
 
-  public static PI2: number = Math.PI * 2;
+  public static readonly PiDouble: number = Math.PI * 2;
+
+  public static readonly PiHalf: number = Math.PI * 0.5;
+
+  public static readonly PiQuarter: number = Math.PI * 0.25;
 
   public x: number;
 
@@ -41,6 +45,15 @@ export default class Point {
   public scale(value: number): this {
     this.x *= value;
     this.y *= value;
+    return this;
+  }
+
+  public multiply(other: Point | number, y?: number): this {
+    const [vx, vy] = other instanceof Point
+      ? [other.x, other.y]
+      : [other, y === undefined ? other : y];
+    this.x *= vx;
+    this.y *= vy;
     return this;
   }
 

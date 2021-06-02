@@ -11,6 +11,8 @@ export default abstract class InteractiveUiNode<
 
   public interactive: boolean = true;
 
+  private mouseWasOnBody: boolean = false;
+
   constructor() {
     super();
     this
@@ -24,12 +26,21 @@ export default abstract class InteractiveUiNode<
   }
 
   protected onInputMouseMove(point: Point, event: MouseEvent): void {
-    if (this.interactive && this.body.contains(point)) {
-      this.onMouseMove(point, event);
-      for (const child of this.children) {
-        if (child instanceof InteractiveUiNode) {
-          child.onInputMouseMove(point, event);
+    if (this.interactive) {
+      if (this.body.contains(point)) {
+        if (!this.mouseWasOnBody) {
+          this.mouseWasOnBody = true;
+          this.onMouseEnter(point, event);
         }
+        this.onMouseMove(point, event);
+        for (const child of this.children) {
+          if (child instanceof InteractiveUiNode) {
+            child.onInputMouseMove(point, event);
+          }
+        }
+      } else if (this.mouseWasOnBody) {
+        this.mouseWasOnBody = false;
+        this.onMouseLeave(point, event);
       }
     }
   }
@@ -101,6 +112,12 @@ export default abstract class InteractiveUiNode<
   }
 
   protected onMouseMove(point: Point, event: MouseEvent): void {
+  }
+
+  protected onMouseEnter(point: Point, event: MouseEvent): void {
+  }
+
+  protected onMouseLeave(point: Point, event: MouseEvent): void {
   }
 
   protected onMouseDown(point: Point, button: PointerButton, event: MouseEvent): void {

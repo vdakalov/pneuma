@@ -11,21 +11,14 @@ export default abstract class DrawableUiNode<
 
   public drawable: boolean = true;
 
-  public angle: number = 0;
-
-  public get degree(): number {
-    return this.angle * Point.Radian2Degree;
-  }
-
-  public set degree(value: number) {
-    this.angle = value * Point.Degree2Radian;
-  }
-
   public readonly body: Rectangle = new Rectangle(0.5, 0.5, 1, 1);
 
   protected onBeforeDraw(canvas: Canvas): void {
     canvas.save();
-    canvas.rotate(this.angle);
+    const rotatePoint = this.body.createRotatePoint();
+    canvas.translate(rotatePoint);
+    canvas.rotate(this.body.angle);
+    canvas.translate(rotatePoint.scale(-1));
   }
 
   protected onAfterDraw(canvas: Canvas): void {

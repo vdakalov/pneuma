@@ -1,5 +1,6 @@
 
 export default class Color {
+  public static Transparent = new Color(0, 0, 0, 0);
   public static Red50: Color = Color.fromHexString('#FFEBEE');
   public static Red100: Color = Color.fromHexString('#FFCDD2');
   public static Red200: Color = Color.fromHexString('#EF9A9A');

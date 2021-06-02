@@ -184,7 +184,7 @@ abstract class Shape {
 class CircleShape extends Shape {
   constructor(context: CanvasRenderingContext2D, abs: number, x: number, y: number, radius: number) {
     super(context, abs);
-    context.arc(x, y, radius, 0, Point.PI2);
+    context.arc(x, y, radius, 0, Point.PiDouble);
   }
 }
 
@@ -282,6 +282,14 @@ export default class Canvas {
     this.context = renderingContext;
   }
 
+  private createAbsolutePoint(point: Point): Point {
+    return new Point(this.width * point.x, this.height * point.y);
+  }
+
+  public createPixelPoint(): Point {
+    return new Point(1 / this.width, 1 / this.height);
+  }
+
   public translate(point: Point): this {
     this.context.translate(this.width * point.x, this.height * point.y);
     return this;
@@ -326,6 +334,24 @@ export default class Canvas {
     const width = this.width * rectangle.width;
     const height = this.height * rectangle.height;
     return new RectangleShape(this.context, this.abs, x, y, width, height);
+  }
+
+  public line(a: Point, b: Point, color?: Color, lineWidth?: number): this {
+    a = this.createAbsolutePoint(a);
+    b = this.createAbsolutePoint(b);
+
+    this.context.beginPath();
+    this.context.moveTo(a.x, a.y);
+    this.context.lineTo(b.x, b.y);
+    if (color !== undefined) {
+      this.context.strokeStyle = color.toString();
+    }
+    if (lineWidth !== undefined) {
+      this.context.lineWidth = lineWidth * this.abs;
+    }
+    this.context.stroke();
+    this.context.closePath();
+    return this;
   }
 
   public text(point: Point, value: string): TextShape {

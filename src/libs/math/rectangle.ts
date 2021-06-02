@@ -27,74 +27,118 @@ export default class Rectangle {
   public height: number;
 
   /**
-   * Pivot of left
+   * Angle in radians
    */
-  public pivotLeft: number;
+  public angle: number;
 
   /**
-   * Pivot of top
+   * Angle in degrees
    */
-  public pivotTop: number;
+  public get degree(): number {
+    return this.angle * Point.Radian2Degree;
+  }
+
+  /**
+   * Angle in degrees
+   */
+  public set degree(value: number) {
+    this.angle = value * Point.Degree2Radian;
+  }
+
+  /**
+   * Position pivot of left
+   */
+  public positionPivotLeft: number;
+
+  /**
+   * Position pivot of top
+   */
+  public positionPivotTop: number;
+
+  /**
+   * Rotation pivot of left
+   */
+  public rotatePivotLeft: number;
+
+  /**
+   * Rotation pivot of top
+   */
+  public rotatePivotTop: number;
 
   /**
    * Absolute left
    */
   public get x1(): number {
-    return this.left - this.width * this.pivotLeft;
+    return this.left - this.width * this.positionPivotLeft;
   }
 
   /**
    * Absolute top
    */
   public get y1(): number {
-    return this.top - this.height * this.pivotTop;
+    return this.top - this.height * this.positionPivotTop;
   }
 
   /**
    * Absolute right
    */
   public get x2(): number {
-    return this.left + this.width * this.pivotLeft;
+    return this.left + this.width * (1 - this.positionPivotLeft);
   }
 
   /**
    * Absolute bottom
    */
   public get y2(): number {
-    return this.top + this.height * this.pivotTop;
+    return this.top + this.height * (1 - this.positionPivotTop);
   }
 
   constructor(left: number,
               top: number,
               width: number,
               height: number,
-              pivotLeft: number = 0.5,
-              pivotTop: number = 0.5) {
+              angle: number = 0,
+              positionPivotLeft: number = 0.5,
+              positionPivotTop: number = 0.5,
+              rotatePivotLeft: number = 0,
+              rotatePivotTop: number = 0) {
     this.left = left;
     this.top = top;
     this.width = width;
     this.height = height;
-    this.pivotLeft = pivotLeft;
-    this.pivotTop = pivotTop;
+    this.angle = angle;
+    this.positionPivotLeft = positionPivotLeft;
+    this.positionPivotTop = positionPivotTop;
+    this.rotatePivotLeft = rotatePivotLeft;
+    this.rotatePivotTop = rotatePivotTop;
   }
 
   public clone(): Rectangle {
-    return new Rectangle(this.left, this.top, this.width, this.height, this.pivotLeft, this.pivotTop);
+    return new Rectangle(
+      this.left,
+      this.top,
+      this.width,
+      this.height,
+      this.angle,
+      this.positionPivotLeft,
+      this.positionPivotTop,
+      this.rotatePivotLeft,
+      this.rotatePivotTop);
   }
 
-  public setTo(other: Rectangle, withPivot: boolean = true): void {
+  public setTo(other: Rectangle): void {
     other.left = this.left;
     other.top = this.top;
     other.width = this.width;
     other.height = this.height;
-    if (withPivot) {
-      other.pivotLeft = this.pivotLeft;
-      other.pivotTop = this.pivotTop;
-    }
+    other.positionPivotLeft = this.positionPivotLeft;
+    other.positionPivotTop = this.positionPivotTop;
+    other.rotatePivotLeft = this.rotatePivotLeft;
+    other.rotatePivotTop = this.rotatePivotTop;
   }
 
-  public setFrom(other: Rectangle, withPivot: boolean = true): void {
-    other.setTo(this, withPivot);
+  public setFrom(other: Rectangle): void {
+    other.setTo(this);
   }
 
   public createTopLeftPoint(): Point {
@@ -117,7 +161,19 @@ export default class Rectangle {
     return new Point(this.x1 + this.width / 2, this.y1 + this.height / 2);
   }
 
+  public createRotatePoint(): Point {
+    return this.createCenterPoint()
+      .add(new Point(this.width * this.rotatePivotLeft, this.height * this.rotatePivotTop))
+  }
+
   public contains(point: Point): boolean {
+    // todo resolve the problem of this algorithm
+    const center = this.createRotatePoint();
+    point = center
+      .clone()
+      .sub(point)
+      .rotate(-this.angle)
+      .add(center);
     return point.x >= this.x1 && this.x2 >= point.x && point.y >= this.y1 && this.y2 >= point.y;
   }
 
